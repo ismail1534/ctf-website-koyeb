@@ -1,0 +1,21 @@
+name: ctf-website
+services:
+  - name: backend
+    instance_type: small
+    env: node
+    build:
+      language: nodejs
+      nodejs:
+        node_version: 16 # Adjust to your preferred Node.js version
+    ports:
+      - port: 3000
+        protocol: http
+    routes:
+      - path: /
+    env:
+      - name: NODE_ENV
+        value: production
+      - name: MONGODB_URI
+        secret: MONGODB_URI
+      - name: SESSION_SECRET
+        secret: SESSION_SECRET 

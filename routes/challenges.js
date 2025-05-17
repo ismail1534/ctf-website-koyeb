@@ -28,8 +28,11 @@ router.get("/download/:id", isAuthenticated, isNotBanned, async (req, res) => {
       return res.status(404).json({ message: "Challenge file not found" });
     }
 
-    const filePath = path.join(__dirname, "..", challenge.file.path);
-    
+    const filePath =
+      process.env.NODE_ENV === "production"
+        ? path.join("/tmp", "uploads", challenge.file.filename)
+        : path.join(__dirname, "..", "public", "uploads", challenge.file.filename);
+
     // Check if file exists before trying to download
     if (!fs.existsSync(filePath)) {
       console.error(`File not found at path: ${filePath}`);
@@ -40,23 +43,27 @@ router.get("/download/:id", isAuthenticated, isNotBanned, async (req, res) => {
     console.log(`Sending file: ${filePath} as ${challenge.file.originalName}`);
 
     // Set content disposition explicitly for better download handling
-    res.setHeader('Content-Disposition', `attachment; filename="${challenge.file.originalName}"`);
-    res.setHeader('Content-Type', 'application/octet-stream');
-    
+    res.setHeader("Content-Disposition", `attachment; filename="${challenge.file.originalName}"`);
+    res.setHeader("Content-Type", "application/octet-stream");
+
     // Send file with explicit options
-    res.sendFile(filePath, {
-      headers: {
-        'Content-Disposition': `attachment; filename="${challenge.file.originalName}"`
-      }
-    }, (err) => {
-      if (err) {
-        console.error('Error sending file:', err);
-        // Don't try to send another response if headers are already sent
-        if (!res.headersSent) {
-          res.status(500).json({ message: "Error sending file" });
+    res.sendFile(
+      filePath,
+      {
+        headers: {
+          "Content-Disposition": `attachment; filename="${challenge.file.originalName}"`,
+        },
+      },
+      (err) => {
+        if (err) {
+          console.error("Error sending file:", err);
+          // Don't try to send another response if headers are already sent
+          if (!res.headersSent) {
+            res.status(500).json({ message: "Error sending file" });
+          }
         }
       }
-    });
+    );
   } catch (error) {
     console.error("Download error:", error);
     res.status(500).json({ message: "Server error" });

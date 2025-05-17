@@ -111,6 +111,7 @@ app.use("/api/auth", require("./routes/auth"));
 app.use("/api/challenges", require("./routes/challenges"));
 app.use("/api/admin", require("./routes/admin"));
 app.use("/api/leaderboard", require("./routes/leaderboard"));
+app.use("/api/files", require("./routes/files"));
 
 // Serve index.html for all non-API routes
 app.get("*", (req, res) => {
@@ -124,7 +125,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, "0.0.0.0", () => {
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

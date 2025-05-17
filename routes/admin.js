@@ -37,10 +37,12 @@ router.post("/challenges", isAdmin, upload.single("file"), async (req, res) => {
 
     // If a file was uploaded and no URL is provided
     if (req.file && !fileUrl) {
+      // For Koyeb deployment, store file info but adjust path for how we'll serve it
       challenge.file = {
         filename: req.file.filename,
         originalName: req.file.originalname,
-        path: path.join("public", "uploads", req.file.filename),
+        // Just store the filename and handle the path resolution when serving
+        path: req.file.filename,
       };
     }
 
@@ -87,19 +89,14 @@ router.put("/challenges/:id", isAdmin, upload.single("file"), async (req, res) =
 
     // If a new file was uploaded and no URL is provided
     if (req.file && !fileUrl) {
-      // Delete the old file if it exists
-      if (challenge.file && challenge.file.path) {
-        const oldFilePath = path.join(__dirname, "..", challenge.file.path);
-        if (fs.existsSync(oldFilePath)) {
-          fs.unlinkSync(oldFilePath);
-        }
-      }
+      // Delete the old file if it exists (no need for physical deletion in Koyeb as we're using tmp storage)
 
       // Set the new file info
       challenge.file = {
         filename: req.file.filename,
         originalName: req.file.originalname,
-        path: path.join("public", "uploads", req.file.filename),
+        // Just store the filename and handle the path resolution when serving
+        path: req.file.filename,
       };
     } else if (fileUrl) {
       // Clear file data if URL is provided
@@ -127,13 +124,7 @@ router.delete("/challenges/:id", isAdmin, async (req, res) => {
       return res.status(404).json({ message: "Challenge not found" });
     }
 
-    // Delete the file if it exists
-    if (challenge.file && challenge.file.path) {
-      const filePath = path.join(__dirname, "..", challenge.file.path);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
-    }
+    // No need for physical file deletion in Koyeb as we're using tmp storage
 
     await Challenge.deleteOne({ _id: req.params.id });
 
