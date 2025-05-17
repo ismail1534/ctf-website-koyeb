@@ -1,5 +1,5 @@
 // Use the full backend URL directly
-const API_BASE_URL = "https://ctf-website-backend-e5la.onrender.com";
+const API_BASE_URL = "http://characteristic-phillis-ismail1534-9c98157a.koyeb.app";
 
 // Debug function to wrap fetch and log requests
 const originalFetch = window.fetch;
